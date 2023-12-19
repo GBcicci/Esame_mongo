@@ -72,10 +72,10 @@ def generate_festival():
         "Provincia": data[1],
         "geometry": data[3],
         "Prezzo": round(random.uniform(50, 200), 2),
-        "Biglietti_disponibili": sum(concert["Biglietti_disponibili"] for concert in concerts)
+        "Biglietti_disponibili": min(concert["Biglietti_disponibili"] for concert in concerts)
     }
     json_string = json.dumps(festival, sort_keys=True)
-    hash_value = hash(json_string)
+    hash_value = f"_{hash(json_string)}_"
     festival['id_univoco'] = hash_value
     for concert in concerts:
         concert['id_festival'] = hash_value

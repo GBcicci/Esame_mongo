@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concerti - TicketHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+
+        main {
+            display: flex;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .filter-container {
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            margin-bottom: 10px;
+        }
+
+        .apply-filters-button {
+            background-color: #2196F3;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .concerto-container {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .concerto-details {
+            margin-bottom: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .concerto-button {
+            background-color: #4caf50;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .concert-container {
+            flex: 2;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .festival-container {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .concerto-container {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 48%; /* Imposta la larghezza del concerto a 48% per una visualizzazione a due colonne */
+        }
+
+
+
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="top-bar">
+        <h1>TicketHub - Il tuo portale per i concerti</h1>
+        <div class="search-container">
+            <input type="text" placeholder="Cerca il tuo prossimo concerto...">
+            <button onclick="alert('Implementa la logica di ricerca')">Trova il tuo prossimo concerto</button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="sidebar">
+        <div class="filter-container">
+            <h2>Filtri</h2>
+            <form action="/filtri" method="get">
+                <!-- Genere Musicale -->
+                <div class="filter-section">
+                    <label>Genere Musicale:</label>
+                    {% for genre in genres %}
+                    <div>
+                        <input type="checkbox" id="genre_{{ genre }}" name="{{ 'genere_' + genre }}"
+                               value="{{ genre }}">
+                        <label for="genre_{{ genre }}">{{ genre }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+
+
+                <!-- Data (Range temporale) -->
+                <div class="filter-section">
+                    <label for="start-date">Data Inizio:</label>
+                    <input type="date" id="start-date" name="start-date">
+                </div>
+
+                <div class="filter-section">
+                    <label for="end-date">Data Fine:</label>
+                    <input type="date" id="end-date" name="end-date">
+                </div>
+
+                <!-- Città -->
+                <div class="filter-section">
+                    <label for="city">Città:</label>
+                    <input type="text" id="city" name="city">
+                </div>
+
+                <!-- Artista -->
+                <div class="filter-section">
+                    <label for="artist">Artista:</label>
+                    <input type="text" id="artist" name="artist">
+                </div>
+
+                <!-- Prezzo (Intervallo) -->
+                <div class="filter-section">
+                    <label for="max-price">Prezzo Massimo:</label>
+                    <input type="number" id="max-price" name="max-price" min="0">
+                </div>
+
+                <!-- Tipo di evento (Concerto/Festival) -->
+                <div class="filter-section">
+                    <label for="event-type">Tipo di Evento:</label>
+                    <select id="event-type" name="event-type">
+                        <option value="1">Concerto</option>
+                        <option value="2">Festival</option>
+                    </select>
+                </div>
+
+                <!-- Bottone "Applica Filtri" -->
+                <button class="apply-filters-button" type="submit">Applica Filtri</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="concert-container">
+        {% for festival in festivals %}
+                <div class="festival-container">
+                    <form action="/acquista_festival" method="get">
+                        <h2>{{ festival[0][0]['Nome_festival'] }}</h2>
+                        <input type="hidden" name="id" value="{{ festival[0][0]['id_univoco'] }}">
+                        <button class="concerto-button" type="submit">Acquista biglietto per Festival</button>
+                    </form>
+                    <p>Data Inizio: {{ festival[0][0]['Data_inizio'] }}</p>
+                    <p>Data Fine: {{ festival[0][0]['Data_fine'] }}</p>
+                    <p>Indirizzo: {{ festival[0][0]['Indirizzo'] }}, {{ festival[0][0]['Citta'] }}, {{ festival[0][0]['Provincia'] }}</p>
+                    <p>Prezzo: {{ festival[0][0]['Prezzo'] }} €</p>
+                    <p>Biglietti disponibili: {{ festival[0][0]['Biglietti_disponibili'] }}</p>
+            <h3>Concerti</h3>
+            {% for concerto in festival[1] %}
+            <div class="concerto-container">
+                <h4>{{ concerto['Nome_concerto'] }}</h4>
+                <p>Artisti: {{ concerto['Nome_artista']|join(', ') }}</p>
+                <p>Data: {{ concerto['Data'] }} | Ora: {{ concerto['Ora'] }}</p>
+                <p>Città: {{ concerto['Citta'] }}, {{ concerto['Provincia'] }}</p>
+                <p>Prezzo Minimo: {{ concerto['Prezzo_min'] }} €</p>
+                <p>Biglietti disponibili: {{ concerto['Biglietti_disponibili'] }}</p>
+                <form action="/acquista_biglietti" method="get">
+                    <input type="hidden" name="id" value="{{ concerto['_id'] }}">
+                    <button class="concerto-button" type="submit">Acquista Biglietto</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+
+</main>
+
+</body>
+
+</html>
