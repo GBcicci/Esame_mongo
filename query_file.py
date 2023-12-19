@@ -9,23 +9,24 @@ Festival_clt = db.Festival
 
 def trova_generi() -> list:
     # funzione che restituisce una lista di generi dei concerti
-    return Concerti_clt.distinct("Generi")
+    return sorted(Concerti_clt.distinct("Generi"))
 
 
 def ottinei_festival_da_concerti(hash_festival: str) -> dict and list:
     # funzione che dato l'id di un festival (campo del biglietto) restituisce il festival e i concerti appartenenti a esso
-    return festival, concerti
-
+    # return festival, concerti
+    ...
 
 def ottieni_sample_concerti() -> list:
     # funzione che restituisce 10 concerti casuali
     # con disponibilità biglietti maggiore di 0 e data posteriore a quella odierna
-    oggi = datetime.now()
+    oggi = str(datetime.now().date())
     concerti_casuali = Concerti_clt.aggregate([
-        {"$match": {"Biglietti_disponibili": {"$gt": 0}, "Data_inizio": {"$gte": oggi}}},
+        {"$match": {"Biglietti_disponibili": {"$gt": 0}, "Data": {"$gte": oggi}}},
         {"$sample": {"size": 10}}
     ])
-    concerti_lista = list(concerti_casuali)
+    concerti_lista = (list(concerti_casuali))
+    print(concerti_lista)
     return concerti_lista
 
 def acquista_concerto(id_biglietto: str) -> bool:

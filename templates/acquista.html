@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli Concerto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .concert-details {
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+        }
+        .zone-button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Dettagli Concerto</h1>
+
+{% for concerto in concerti %}
+    <div class="concert-details">
+        <p><strong>Artisti:</strong> {{ concerto.Artisti | join(', ') }}</p>
+        <p><strong>Data:</strong> {{ concerto.Data }}</p>
+        <p><strong>Luogo:</strong> {{ concerto.Luogo.Città }}, {{ concerto.Luogo.Provincia }}, {{ concerto.Luogo.Stato }}</p>
+        <p><strong>Disponibilità Biglietti:</strong> {{ concerto.Disponibilita_biglietti }}</p>
+
+        <form action="/acquisto_fatto" method="get">
+            <input type="hidden" name="concerto_id" value="{{ concerto._id }}">
+            <div class="button-container">
+                {% for zona, prezzo in concerto.Prezzo.items() %}
+                    <input type="hidden" name="id" value="{{ concerto['_id'] }}">
+                    <input type="hidden" name="nome" value="{{ concerto['Nome_concerto'] }}">
+                    <input type="hidden" name="festival" value="{{ concerto['Festival'] }}">
+                    <button class="zone-button" name="zona" value="{{ zona }}">Zona {{ zona }} - {{ prezzo }}€</button>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+{% endfor %}
+
+</body>
+</html>

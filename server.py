@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def principale():
-    results = qf.concerti_iniziali()
+    results = qf.ottieni_sample_concerti()
     generi = qf.trova_generi()
     return render_template("principale.html", concerti=results, genres=generi)
 

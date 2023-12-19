@@ -15,7 +15,7 @@ def generate_geometry():
     }
 
 
-def generate_random_date(start_date="2023-01-01", end_date="2023-12-31"):
+def generate_random_date(start_date="2020-01-01", end_date="2025-12-31"):
     start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
     end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
     delta_days = (end_datetime - start_datetime).days
@@ -27,7 +27,7 @@ def generate_random_date(start_date="2023-01-01", end_date="2023-12-31"):
 def generate_concert(data: list = False):
     concert = {
         "Nome_concerto": fake.catch_phrase(),
-        "Nome_artista": fake.name(),
+        "Nome_artista": [fake.name() for _ in range(random.randint(1, 3))],
         "Pseudonimi_artista": [fake.user_name() for _ in range(random.randint(1, 3))],
         "Generi": random.sample(generi_musicali, random.randint(1, len(generi_musicali))),
         "Data": str(generate_random_date()),
@@ -45,7 +45,8 @@ def generate_concert(data: list = False):
     if data:
         concert['Citta'] = data[0]
         concert['Provincia'] = data[1]
-        concert['geometry'] = data[2]
+        concert['Indirizzo'] = data[2]
+        concert['geometry'] = data[3]
     return concert
 
 
@@ -58,7 +59,7 @@ def generate_festival_data(data):
 
 
 def generate_festival():
-    data = (fake.city(), fake.state(), generate_geometry())
+    data = (fake.city(), fake.state(), fake.address(), generate_geometry())
     concerts = generate_festival_data(data)
     festival = {
         "Nome_festival": fake.company(),
@@ -66,10 +67,10 @@ def generate_festival():
         "Artisti": list(set([artist for concert in concerts for artist in concert["Pseudonimi_artista"]])),
         "Data_inizio": min(concert["Data"] for concert in concerts),
         "Data_fine": max(concert["Data"] for concert in concerts),
-        "Indirizzo": fake.address(),
-        "Citta": fake.city(),
-        "Provincia": fake.state(),
-        "geometry": generate_geometry(),
+        "Indirizzo": data[2],
+        "Citta": data[0],
+        "Provincia": data[1],
+        "geometry": data[3],
         "Prezzo": round(random.uniform(50, 200), 2),
         "Biglietti_disponibili": sum(concert["Biglietti_disponibili"] for concert in concerts)
     }
@@ -86,21 +87,21 @@ if __name__ == "__main__":
     concert_list = []
 
     # Genera 20 concerti non associati a festival
-    for _ in range(20):
+    for _ in range(40):
         concert = generate_concert()
         concert_list.append(concert)
 
     # Genera 5 festival con i rispettivi concerti
-    for _ in range(5):
+    for _ in range(10):
         festival, concerts = generate_festival()
         festival_list.append(festival)
         for concert in concerts:
-            concert_list.extend(concert)
+            concert_list.append(concert)
 
     # Salva i dati del festival in un file JSON
     with open("dati_festival.json", "w") as festival_file:
         json.dump(festival_list, festival_file, indent=4)
 
     # Salva i dati dei concerti in un file JSON
-    with open("concerti_file.json", "w") as concert_file:
+    with open("dati_concerti.json", "w") as concert_file:
         json.dump(concert_list, concert_file, indent=4)
