@@ -1,3 +1,4 @@
+from bson import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
 
@@ -26,12 +27,18 @@ def ottieni_sample_concerti() -> list:
         {"$sample": {"size": 10}}
     ])
     concerti_lista = (list(concerti_casuali))
-    print(concerti_lista)
     return concerti_lista
 
-def acquista_concerto(id_biglietto: str) -> bool:
+def acquista_concerto(id_biglietto: str) -> str or bool:
+    try:
+        object_id = ObjectId(id_biglietto)
+        biglietto = Concerti_clt.find_one({"_id": object_id})
+        if int(biglietto["Biglietti_disponibili"]) > 0:
+            Concerti_clt.update_one({"_id": object_id}, {"$inc": {"Biglietti_disponibili": -1}})
+            return biglietto['Nome_concerto']
+    except:
+        return False
     # funzione che permette di acquistare un biglietto, restituisce vero se tutto va a buon fine
-    ...
 
 
 def acquista_festival(id_festival: str) -> bool:
