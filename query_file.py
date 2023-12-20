@@ -99,4 +99,23 @@ def filtra_festival(lista_generi: list, date: str, citta: str, artisti: str, pre
 
 def ricerca_generale(stringa: str) -> list:
     # funzione che data una stringa in input, interroghi tutti i campi dei documenti e restituisca una lista di concerti
-    ...
+    risultati_concerti = Concerti_clt.find({
+        "$or": [
+            {"$text": {"$search": stringa}},
+            {"Nome_concerto": {"$regex": stringa, "$options": "i"}},
+            {"Nome_artista": {"$regex": stringa, "$options": "i"}},
+            {"Pseudonimi_artista": {"$regex": stringa, "$options": "i"}},
+            {"Generi": {"$regex": stringa, "$options": "i"}},
+            {"Citta": {"$regex": stringa, "$options": "i"}}]})
+
+    risultati_festival = Festival_clt.find({
+        "$or": [
+            {"$text": {"$search": stringa}},
+            {"Artisti": {"$regex": stringa, "$options": "i"}},
+            {"Generi": {"$regex": stringa, "$options": "i"}},
+            {"Nome_festival": {"$regex": stringa, "$options": "i"}}]})
+
+    risultati_concerti_lista = list(risultati_concerti)
+    risultati_festival_lista = list(risultati_festival)
+    risultati_totali = risultati_concerti_lista + risultati_festival_lista
+    return risultati_totali
