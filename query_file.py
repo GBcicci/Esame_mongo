@@ -2,7 +2,7 @@ from bson import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
 
-client = MongoClient('mongodb://Giuseppe:1Admin!@localhost:54321/')
+client = MongoClient('mongodb://localhost:59846/')
 db = client.Esami
 Concerti_clt = db.Concerti
 Festival_clt = db.Festival
@@ -22,7 +22,6 @@ def visualizza_festival(hash_festival: str) -> dict and list:
         concerti = list(Concerti_clt.find({"id_festival": hash_festival}))
         out.append([festival, concerti])
     return out
-
 
 
 def ottieni_sample_concerti() -> list:
@@ -70,7 +69,27 @@ def acquista_festival(id_festival: str) -> bool:
 
 def filtra_concerti(lista_generi: list, date: str, citta: str, artisti: str, prezzo: str) -> list:
     # funzione che restituisce una lista di concerti in base ai filtri inseriti.
-    ...
+    query = {}
+    if lista_generi:
+        query["Generi"] = {"$in": lista_generi}
+
+    if date:
+        query["Data"] = {"$gte": date}
+
+    if citta:
+        query["Citta"] = citta
+
+    if artisti:
+        query["$or"] = [
+            {"Nome_artista": {"$in": [artista.strip() for artista in artisti.split(",")]}},
+            {"Pseudonimi_artista": {"$in": [artista.strip() for artista in artisti.split(",")]}}
+        ]
+
+    if prezzo:
+        query["Prezzo_min"] = {"$lte": float(prezzo)}
+
+    risultati = list(Concerti_clt.find(query))
+    return risultati
 
 
 def filtra_festival(lista_generi: list, date: str, citta: str, artisti: str, prezzo: str) -> list:
