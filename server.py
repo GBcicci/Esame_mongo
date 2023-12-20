@@ -11,6 +11,7 @@ def principale():
     results = qf.ottieni_sample_concerti()
     return render_template("principale.html", concerti=results, genres=generi)
 
+
 @app.route("/filtri")
 def concerti_filtrati():
     lista_generi = request.args.getlist('genere')
@@ -18,18 +19,25 @@ def concerti_filtrati():
     citta = request.args.get('citta')
     artisti = request.args.get('artisti')
     prezzo = request.args.get('prezzo')
+    tipo = request.args.get('tipo_evento')
+    if int(tipo) == 1:
+        risultati = filtra_concerti(
+            lista_generi=lista_generi,
+            date=data,
+            citta=citta,
+            artisti=artisti,
+            prezzo=prezzo
+        )
+        return render_template("principale.html", concerti=risultati, genres=generi)
+    elif int(tipo) == 2:
+        festivals = []
+        # codice per filtro concerti
+        return render_template('principale_festival.html', festivals=festivals, genres=generi)
 
-    risultati = filtra_concerti(
-        lista_generi=lista_generi,
-        date=data,
-        citta=citta,
-        artisti=artisti,
-        prezzo=prezzo
-    )
-
-    return render_template("principale.html", concerti=risultati)
 
 app.route("/acquista_biglietti")
+
+
 def acquisto_biglietto():
     id = request.args.get('id')
     out = qf.acquista_concerto(id_biglietto=id)

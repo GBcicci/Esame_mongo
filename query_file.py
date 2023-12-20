@@ -2,7 +2,8 @@ from bson import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
 
-client = MongoClient('mongodb://localhost:59846/')
+#client = MongoClient('mongodb://Giuseppe:1Admin!@localhost:54321/')
+client = MongoClient('mongodb://Giuseppe:1Admin!@localhost:54321/')
 db = client.Esami
 Concerti_clt = db.Concerti
 Festival_clt = db.Festival
@@ -33,6 +34,7 @@ def ottieni_sample_concerti() -> list:
         {"$sample": {"size": 10}}
     ])
     concerti_lista = (list(concerti_casuali))
+    print(concerti_lista)
     return concerti_lista
 
 
@@ -89,6 +91,7 @@ def filtra_concerti(lista_generi: list, date: str, citta: str, artisti: str, pre
         query["Prezzo_min"] = {"$lte": float(prezzo)}
 
     risultati = list(Concerti_clt.find(query))
+    print(risultati)
     return risultati
 
 
