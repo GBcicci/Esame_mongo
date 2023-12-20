@@ -97,7 +97,28 @@ def filtra_concerti(lista_generi: list, date: str, citta: str, artisti: str, pre
 
 def filtra_festival(lista_generi: list, date: str, citta: str, artisti: str, prezzo: str) -> list:
     # funzione che restituisce una lista di festival in base ai filtri inseriti.
-    ...
+    query = {}
+    if lista_generi:
+        query["Generi"] = {"$in": lista_generi}
+
+    if date:
+        query["Data"] = {"$gte": date}
+
+    if citta:
+        query["Citta"] = citta
+
+    if artisti:
+        query["$or"] = [
+            {"Artisti": {"$in": [artista.strip() for artista in artisti.split(",")]}},
+            {"Pseudonimi_artista": {"$in": [artista.strip() for artista in artisti.split(",")]}}
+        ]
+
+    if prezzo:
+        query["Prezzo_min"] = {"$lte": float(prezzo)}
+
+    risultati = list(Festival_clt.find(query))
+    print(risultati)
+    return risultati
 
 
 def ricerca_generale(stringa: str) -> list:
