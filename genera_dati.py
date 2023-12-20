@@ -6,6 +6,17 @@ from faker import Faker
 fake = Faker()
 
 generi_musicali = ["Rock", "Pop", "Hip Hop", "Electronic", "Jazz", "Blues", "Country", "Reggae"]
+citta_italiane = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze", "Venezia", "Verona"]
+province_italiane = ["RM", "MI", "NA", "TO", "PA", "GE", "BO", "FI", "VE", "VR"]
+
+
+def generate_random_city_and_province():
+    citta = random.choice(citta_italiane)
+    provincia = province_italiane[citta_italiane.index(citta)]
+    return citta, provincia
+
+
+citta, provincia = generate_random_city_and_province()
 
 
 def generate_geometry():
@@ -32,8 +43,8 @@ def generate_concert(data: list = False):
         "Generi": random.sample(generi_musicali, random.randint(1, len(generi_musicali))),
         "Data": str(generate_random_date()),
         "Ora": fake.time(),
-        "Citta": fake.city(),
-        "Provincia": fake.state(),
+        "Citta": citta,
+        "Provincia": provincia,
         "geometry": generate_geometry(),
         "Prezzo_min": random.uniform(20, 100),
         "Prezzi": {f"Tipo_{i + 1}": round(random.uniform(30, 150), 2) for i in range(random.randint(1, 4))},
