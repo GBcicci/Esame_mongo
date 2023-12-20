@@ -70,7 +70,7 @@ def generate_festival_data(data):
 
 
 def generate_festival():
-    data = (fake.city(), fake.state(), fake.address(), generate_geometry())
+    data = (citta, provincia, fake.address(), generate_geometry())
     concerts = generate_festival_data(data)
     festival = {
         "Nome_festival": fake.company(),
