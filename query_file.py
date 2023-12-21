@@ -2,7 +2,7 @@ from bson import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
 
-#client = MongoClient('mongodb://Giuseppe:1Admin!@localhost:54321/')
+# client = MongoClient('mongodb://Giuseppe:1Admin!@localhost:54321/')
 client = MongoClient('mongodb://Giuseppe:1Admin!@localhost:54321/')
 db = client.Esami
 Concerti_clt = db.Concerti
@@ -34,29 +34,33 @@ def ottieni_sample_concerti() -> list:
         {"$sample": {"size": 10}}
     ])
     concerti_lista = (list(concerti_casuali))
-    print(concerti_lista)
     return concerti_lista
 
 
 def acquista_concerto(id_biglietto: str) -> str or bool:
-    try:
-        object_id = ObjectId(id_biglietto)
-        biglietto = Concerti_clt.find_one({"_id": object_id})
-        if int(biglietto["Biglietti_disponibili"]) > 0:
-            Concerti_clt.update_one({"_id": object_id}, {"$inc": {"Biglietti_disponibili": -1}})
-            try:
-                Festival = Festival_clt.find_one({'id_univoco': biglietto['id_festival']})
-                biglietto = Concerti_clt.find_one({"_id": object_id})
-                if int(Festival['Biglietti_disponibili']) > int(biglietto["Biglietti_disponibili"]):
-                    Festival_clt.update_one({'id_univoco': biglietto['id_festival']},
-                                            {"$set": {'Biglietti_disponibili': biglietto["Biglietti_disponibili"]}})
-                client.close()
-            except:
-                return False
-            return biglietto['Nome_concerto']
-    except:
-        return False
     # funzione che permette di acquistare un biglietto, restituisce vero se tutto va a buon fine
+    object_id = ObjectId(id_biglietto)
+    biglietto = Concerti_clt.find_one({"_id": object_id})
+    quantita = int(biglietto["Biglietti_disponibili"])
+    if quantita > 0:
+        try:
+            Festival = Festival_clt.find_one({'id_univoco': biglietto['id_festival']})
+            concerti_in_festival=Concerti_clt.find({'id_festival': biglietto['id_festival']})
+            for elem in concerti_in_festival['Biglietti_disponibili']:
+                elem=int(elem)
+                if elem>0:
+                    if quantita<elem:
+                        quantita=elem
+            if int(Festival['Biglietti_disponibili']) > quantita:
+                Festival_clt.update_one({'id_univoco': biglietto['id_festival']},
+                                        {"$set": {'Biglietti_disponibili': biglietto["Biglietti_disponibili"]}})
+        except:
+            pass
+        Concerti_clt.update_one({"_id": object_id}, {"$inc": {"Biglietti_disponibili": -1}})
+        client.close()
+        return biglietto['Nome_concerto']
+    else:
+        return False
 
 
 def acquista_festival(id_festival: str) -> bool:
@@ -91,7 +95,9 @@ def filtra_concerti(lista_generi: list, date: str, citta: str, artisti: str, pre
         query["Prezzo_min"] = {"$lte": float(prezzo)}
 
     risultati = list(Concerti_clt.find(query))
-    print(risultati)
+    for risultato in risultati:
+        print(risultato['Nome_artista'])
+        print(risultato)
     return risultati
 
 
@@ -117,7 +123,9 @@ def filtra_festival(lista_generi: list, date: str, citta: str, artisti: str, pre
         query["Prezzo_min"] = {"$lte": float(prezzo)}
 
     risultati = list(Festival_clt.find(query))
-    print(risultati)
+    for risultato in risultati:
+        print(risultato)
+        print(risultato['Generi'])
     return risultati
 
 
@@ -132,14 +140,6 @@ def ricerca_generale(stringa: str) -> list:
             {"Generi": {"$regex": stringa, "$options": "i"}},
             {"Citta": {"$regex": stringa, "$options": "i"}}]})
 
-    risultati_festival = Festival_clt.find({
-        "$or": [
-            {"$text": {"$search": stringa}},
-            {"Artisti": {"$regex": stringa, "$options": "i"}},
-            {"Generi": {"$regex": stringa, "$options": "i"}},
-            {"Nome_festival": {"$regex": stringa, "$options": "i"}}]})
-
     risultati_concerti_lista = list(risultati_concerti)
-    risultati_festival_lista = list(risultati_festival)
-    risultati_totali = risultati_concerti_lista + risultati_festival_lista
-    return risultati_totali
+    print(risultati_concerti_lista)
+    return risultati_concerti_lista

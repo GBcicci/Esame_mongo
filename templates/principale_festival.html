@@ -120,6 +120,7 @@
 
 
 
+
     </style>
 </head>
 
@@ -129,8 +130,10 @@
     <div class="top-bar">
         <h1>TicketHub - Il tuo portale per i concerti</h1>
         <div class="search-container">
-            <input type="text" placeholder="Cerca il tuo prossimo concerto...">
-            <button onclick="alert('Implementa la logica di ricerca')">Trova il tuo prossimo concerto</button>
+            <form action="/ricerca_generale" method="get">
+                <input type="text" id="stringa" placeholder="Cerca il tuo prossimo concerto...">
+                <button type="submit">Cerca</button>
+            </form>
         </div>
     </div>
 </header>
@@ -194,17 +197,18 @@
 
     <div class="concert-container">
         {% for festival in festivals %}
-                <div class="festival-container">
-                    <form action="/acquista_festival" method="get">
-                        <h2>{{ festival[0][0]['Nome_festival'] }}</h2>
-                        <input type="hidden" name="id" value="{{ festival[0][0]['id_univoco'] }}">
-                        <button class="concerto-button" type="submit">Acquista biglietto per Festival</button>
-                    </form>
-                    <p>Data Inizio: {{ festival[0][0]['Data_inizio'] }}</p>
-                    <p>Data Fine: {{ festival[0][0]['Data_fine'] }}</p>
-                    <p>Indirizzo: {{ festival[0][0]['Indirizzo'] }}, {{ festival[0][0]['Citta'] }}, {{ festival[0][0]['Provincia'] }}</p>
-                    <p>Prezzo: {{ festival[0][0]['Prezzo'] }} €</p>
-                    <p>Biglietti disponibili: {{ festival[0][0]['Biglietti_disponibili'] }}</p>
+        <div class="festival-container">
+            <form action="/acquista_festival" method="get">
+                <h2>{{ festival[0][0]['Nome_festival'] }}</h2>
+                <input type="hidden" name="id" value="{{ festival[0][0]['id_univoco'] }}">
+                <button class="concerto-button" type="submit">Acquista biglietto per Festival</button>
+            </form>
+            <p>Data Inizio: {{ festival[0][0]['Data_inizio'] }}</p>
+            <p>Data Fine: {{ festival[0][0]['Data_fine'] }}</p>
+            <p>Indirizzo: {{ festival[0][0]['Indirizzo'] }}, {{ festival[0][0]['Citta'] }}, {{
+                festival[0][0]['Provincia'] }}</p>
+            <p>Prezzo: {{ festival[0][0]['Prezzo'] }} €</p>
+            <p>Biglietti disponibili: {{ festival[0][0]['Biglietti_disponibili'] }}</p>
             <h3>Concerti</h3>
             {% for concerto in festival[1] %}
             <div class="concerto-container">

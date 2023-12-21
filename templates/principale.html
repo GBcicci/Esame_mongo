@@ -102,6 +102,9 @@
 
 
 
+
+
+
     </style>
 </head>
 
@@ -111,8 +114,10 @@
     <div class="top-bar">
         <h1>TicketHub - Il tuo portale per i concerti</h1>
         <div class="search-container">
-            <input type="text" placeholder="Cerca il tuo prossimo concerto...">
-            <button onclick="alert('Implementa la logica di ricerca')">Trova il tuo prossimo concerto</button>
+            <form action="/ricerca_generale" method="get">
+                <input type="text" id="stringa" placeholder="Cerca il tuo prossimo concerto...">
+                <button type="submit">Cerca</button>
+            </form>
         </div>
     </div>
 </header>
@@ -188,7 +193,14 @@
             <div class="button-container">
                 <form action="/acquista_biglietti" method="get">
                     <input type="hidden" name="id" value="{{ concerto['_id'] }}">
-                    <button class="concerto-button" type="submit">Acquista Biglietto</button>
+                    <p>Scegli il tipo di biglietto:</p>
+                    {% for tipo, prezzo in concerto['Prezzi'].items() %}
+                    <label>
+                        <input type="radio" name="tipo_biglietto" value="{{ tipo }}"> {{ tipo }} - €{{ prezzo }} --{{ concerto['_id'] }}
+                    </label><br>
+                    {% endfor %}
+                    <br>
+                    <button type="submit">Conferma Acquisto</button>
                 </form>
                 {% if concerto['id_festival'] %}
                 <form action="/visualizza_festival" method="get">

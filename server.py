@@ -21,7 +21,7 @@ def concerti_filtrati():
     prezzo = request.args.get('prezzo')
     tipo = request.args.get('tipo_evento')
     if int(tipo) == 1:
-        risultati = filtra_concerti(
+        risultati = qf.filtra_concerti(
             lista_generi=lista_generi,
             date=data,
             citta=citta,
@@ -30,19 +30,29 @@ def concerti_filtrati():
         )
         return render_template("principale.html", concerti=risultati, genres=generi)
     elif int(tipo) == 2:
-        festivals = []
-        # codice per filtro concerti
+        festivals = qf.filtra_festival(
+            lista_generi=lista_generi,
+            date=data,
+            citta=citta,
+            artisti=artisti,
+            prezzo=prezzo
+        )
         return render_template('principale_festival.html', festivals=festivals, genres=generi)
 
 
-app.route("/acquista_biglietti")
+@app.route("/ricerca_generale")
+def ricerca_generale():
+    stringa = request.args.get('stringa')
+    out = qf.ricerca_generale(stringa)
+    return render_template("principale.html", concerti=out, genres=generi)
 
 
+@app.route("/acquista_biglietti")
 def acquisto_biglietto():
     id = request.args.get('id')
     out = qf.acquista_concerto(id_biglietto=id)
     if out:
-        return render_template('acquisto_avvenuto.html', nome=out['nome'])
+        return render_template('acquisto_avvenuto.html', nome=out)
     return render_template('errore.html', nome=out)
 
 
