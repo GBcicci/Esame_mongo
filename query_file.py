@@ -42,7 +42,7 @@ def ottieni_sample_concerti() -> list:
     return concerti_lista
 
 
-def acquista_concerto(id_biglietto: str) -> str or bool:
+def acquista_concerto(id_biglietto: str, num: int) -> str or bool:
     # funzione che permette di acquistare un biglietto, restituisce vero se tutto va a buon fine
     object_id = ObjectId(id_biglietto)
     biglietto = Concerti_clt.find_one({"_id": object_id})
@@ -61,21 +61,23 @@ def acquista_concerto(id_biglietto: str) -> str or bool:
                                         {"$set": {'Biglietti_disponibili': biglietto["Biglietti_disponibili"]}})
         except:
             pass
-        Concerti_clt.update_one({"_id": object_id}, {"$inc": {"Biglietti_disponibili": -1}})
+        Concerti_clt.update_one({"_id": object_id}, {"$inc": {"Biglietti_disponibili": -num}})
+        biglietto = Concerti_clt.find_one({"_id": object_id})
         client.close()
-        return biglietto['Nome_concerto']
+        return biglietto['Nome_concerto'], biglietto['Biglietti_disponibili']
     else:
         return False
 
 
-def acquista_festival(id_festival: str) -> bool:
+def acquista_festival(id_festival: str, num: int):
     # funzione che permette di acquistare un festival, restituisce vero se tutto va a buon fine
     biglietto = Festival_clt.find_one({"id_univoco": id_festival})
     if int(biglietto["Biglietti_disponibili"]) > 0:
-        Festival_clt.update_one({"id_univoco": id_festival}, {"$inc": {"Biglietti_disponibili": -1}})
-        Concerti_clt.update_many({"id_festival": id_festival}, {"$inc": {"Biglietti_disponibili": -1}})
+        Festival_clt.update_one({"id_univoco": id_festival}, {"$inc": {"Biglietti_disponibili": -num}})
+        Concerti_clt.update_many({"id_festival": id_festival}, {"$inc": {"Biglietti_disponibili": -num}})
+        biglietto = Festival_clt.find_one({"id_univoco": id_festival})
         client.close()
-        return biglietto['Nome_festival']
+        return biglietto['Nome_festival'], biglietto['Biglietti_disponibili']
 
 
 def filtra_concerti(lista_generi: list, date: str, citta: str, artista: str, prezzo: str) -> list:
@@ -155,13 +157,13 @@ def ricerca_generale(stringa: str) -> list:
 def ricerca_geografica_concerti(latitudine: float, longitudine: float, raggio: float):
     # funzione che date le coordinate e raggio restituisce i concerti in quell'area
     query = {"geometry.coordinates": {
-                "$near": {
-                    "$geometry": {
-                        "type": "Point", "coordinates": [latitudine, longitudine]
-                    },
-                    "$maxDistance":  raggio * 1000
-                    }
+        "$near": {
+            "$geometry": {
+                "type": "Point", "coordinates": [latitudine, longitudine]
+            },
+            "$maxDistance": raggio * 1000
         }
+    }
     }
     risultati = Concerti_clt.find(query)
     return list(risultati)

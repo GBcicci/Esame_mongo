@@ -49,10 +49,11 @@ def ricerca_generale():
 @app.route("/acquista_biglietti")
 def acquisto_biglietto():
     id = request.args.get('id')
-    out = qf.acquista_concerto(id_biglietto=id)
+    quantita = int(request.args.get('quantita_biglietto'))
+    out, num = qf.acquista_concerto(id_biglietto=id, num=quantita)
     if out:
-        return render_template('acquisto_avvenuto.html', nome=out)
-    return render_template('errore.html', nome=out)
+        return render_template('acquisto_avvenuto.html', nome=out, num=num)
+    return render_template('errore.html')
 
 
 @app.route("/visualizza_festival")
@@ -65,9 +66,10 @@ def visualizza_festival():
 @app.route("/acquista_festival")
 def acquista_festival():
     id = request.args.get('id')
-    out = qf.acquista_festival(id_festival=id)
+    num = int(request.args.get('quantita_biglietto'))
+    out, num= qf.acquista_festival(id_festival=id, num=num)
     if out:
-        return render_template('acquisto_avvenuto.html', nome=out)
+        return render_template('acquisto_avvenuto.html', nome=out, num=num)
     return render_template('errore.html', nome=out)
 
 
