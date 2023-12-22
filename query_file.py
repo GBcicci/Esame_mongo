@@ -138,7 +138,6 @@ def filtra_festival(lista_generi: list, date: str, citta: str, artista: str, pre
 
 def ricerca_generale(stringa: str) -> list:
     # funzione che data una stringa in input, interroghi tutti i campi dei documenti e restituisca una lista di concerti
-    print(stringa)
     query = {
         '$or': [
             {'Nome_concerto': {'$regex': stringa, '$options': 'i'}},

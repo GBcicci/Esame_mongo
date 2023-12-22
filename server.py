@@ -42,7 +42,6 @@ def concerti_filtrati():
 @app.route("/ricerca_generale")
 def ricerca_generale():
     stringa = request.args.get('stringa')
-    print(stringa)
     out = qf.ricerca_generale(stringa)
     return render_template("principale.html", concerti=out, genres=generi)
 
