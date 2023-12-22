@@ -2,8 +2,8 @@ from bson import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
 
-# client = MongoClient('mongodb://Giuseppe:1Admin!@localhost:54321/')
-client = MongoClient('mongodb://localhost:59846/')
+client = MongoClient('mongodb://Giuseppe:1Admin!@localhost:54321/')
+# client = MongoClient('mongodb://localhost:59846/')
 db = client.Esami
 Concerti_clt = db.Concerti
 Festival_clt = db.Festival
@@ -14,15 +14,20 @@ def trova_generi() -> list:
     return sorted(Concerti_clt.distinct("Generi"))
 
 
-def visualizza_festival(hash_festival: str) -> dict and list:
+def visualizza_festival(hash_festival: str or list) -> dict and list:
     # funzione che dato l'id di un festival (campo del biglietto) restituisce il festival e i concerti appartenenti a esso
-    # return festival, concerti
     out = []
-    for _ in range(3):
+    if type(hash_festival) == str:
         festival = list(Festival_clt.find({"id_univoco": hash_festival}))
         concerti = list(Concerti_clt.find({"id_festival": hash_festival}))
         out.append([festival, concerti])
-    return out
+        return out
+    else:
+        for elem in hash_festival:
+            festival = list(Festival_clt.find({"id_univoco": elem}))
+            concerti = list(Concerti_clt.find({"id_festival": elem}))
+            out.append([festival, concerti])
+        return out
 
 
 def ottieni_sample_concerti() -> list:
@@ -73,94 +78,78 @@ def acquista_festival(id_festival: str) -> bool:
         return biglietto['Nome_festival']
 
 
-def filtra_concerti(lista_generi: list, date: str, citta: str, artisti: str, prezzo: str) -> list:
-    # funzione che restituisce una lista di concerti in base ai filtri inseriti.
+def filtra_concerti(lista_generi: list, date: str, citta: str, artista: str, prezzo: str) -> list:
     query = {}
-
+    conditions = []
+    oggi = str(datetime.now().date())
+    conditions.append({"Biglietti_disponibili": {"$gt": 0}, "Data": {"$gte": oggi}})
     if lista_generi:
-        query["Generi"] = {"$in": lista_generi}
-
+        conditions.append({"Generi": {"$in": lista_generi}})
     if date:
-        try:
-            query["Data"] = {"$gte": datetime.strptime(date, "%d/%m/%Y")}
-        except ValueError:
-            print("Formato data non valido. Inserisci la data nel formato corretto (DD/MM/YYYY).")
-            return []
-
+        conditions.append({"Data": {"$gte": date}})
     if citta:
-        query["Citta"] = citta
+        conditions.append({"Citta": {"$regex": citta, "$options": 'i'}})
+    if artista:
+        conditions.append({
+            "$or": [
+                {"Nome_artista": {"$regex": artista, "$options": 'i'}},
+                {"Pseudonimi_artista": {"$regex": artista, "$options": 'i'}}
+            ]
+        })
+    if prezzo:
+        conditions.append({"Prezzo_min": {"$lte": float(prezzo)}})
 
-    if artisti:
-        artisti_list = [artista.strip() for artista in artisti]
-        query["$or"] = [
-            {"Nome_artista": {"$in": artisti_list}},
-            {"Pseudonimi_artista": {"$in": artisti_list}}
-        ]
-
-    if prezzo is not None:
-        query["Prezzo_min"] = {"$lte": prezzo}
-
-    # Esecuzione della query
+    if conditions:
+        query["$and"] = conditions
     risultati = list(Concerti_clt.find(query))
-
     return risultati
 
 
-# Richiedi i filtri in input
-lista_generi = input("Inserisci i generi (separati da virgola): ").split(',')
-date = input("Inserisci la data di inizio (formato YYYY-MM-DD): ")
-citta = input("Inserisci la città: ")
-artisti = input("Inserisci gli artisti (separati da virgola): ")
-prezzo = input("Inserisci il prezzo massimo: ")
-
-# Chiamata alla funzione con i filtri inseriti dall'utente
-risultati = filtra_concerti(lista_generi, date, citta, artisti, prezzo)
-
-# Stampa i risultati ottenuti dalla funzione
-for risultato in risultati:
-    print(risultato['Nome_artista'])
-    print(risultato)
-
-
-def filtra_festival(lista_generi: list, date: str, citta: str, artisti: str, prezzo: str) -> list:
+def filtra_festival(lista_generi: list, date: str, citta: str, artista: str, prezzo: str) -> list:
     # funzione che restituisce una lista di festival in base ai filtri inseriti.
     query = {}
+    conditions = []
+    oggi = str(datetime.now().date())
+    conditions.append({"Biglietti_disponibili": {"$gt": 0}, "Data_fine": {"$gte": oggi}})
     if lista_generi:
-        query["Generi"] = {"$in": lista_generi}
-
+        conditions.append({"Generi": {"$in": lista_generi}})
     if date:
-        query["Data"] = {"$gte": date}
-
+        conditions.append({"Data": {"$gte": date}})
     if citta:
-        query["Citta"] = citta
-
-    if artisti:
-        query["$or"] = [
-            {"Artisti": {"$in": [artista.strip() for artista in artisti.split(",")]}},
-            {"Pseudonimi_artista": {"$in": [artista.strip() for artista in artisti.split(",")]}}
-        ]
-
+        conditions.append({"Citta": {"$regex": citta, "$options": 'i'}})
+    if artista:
+        conditions.append({
+            "$or": [
+                {"Nome_artista": {"$regex": artista, "$options": 'i'}},
+                {"Pseudonimi_artista": {"$regex": artista, "$options": 'i'}}
+            ]
+        })
     if prezzo:
-        query["Prezzo_min"] = {"$lte": float(prezzo)}
+        conditions.append({"Prezzo_min": {"$lte": float(prezzo)}})
 
+    if conditions:
+        query["$and"] = conditions
     risultati = list(Festival_clt.find(query))
-    for risultato in risultati:
-        print(risultato)
-        print(risultato['Generi'])
-    return risultati
+    out = []
+    for elem in risultati:
+        out.append(elem["id_univoco"])
+    return out
 
 
 def ricerca_generale(stringa: str) -> list:
     # funzione che data una stringa in input, interroghi tutti i campi dei documenti e restituisca una lista di concerti
-    risultati_concerti = Concerti_clt.find({
-        "$or": [
-            {"$text": {"$search": stringa}},
-            {"Nome_concerto": {"$regex": stringa, "$options": "i"}},
-            {"Nome_artista": {"$regex": stringa, "$options": "i"}},
-            {"Pseudonimi_artista": {"$regex": stringa, "$options": "i"}},
-            {"Generi": {"$regex": stringa, "$options": "i"}},
-            {"Citta": {"$regex": stringa, "$options": "i"}}]})
-
+    print(stringa)
+    query = {
+        '$or': [
+            {'Nome_concerto': {'$regex': stringa, '$options': 'i'}},
+            {'Nome_artista': {'$regex': stringa, '$options': 'i'}},
+            {'Pseudonimi_artista': {'$regex': stringa, '$options': 'i'}},
+            {'Generi': {'$regex': stringa, '$options': 'i'}},
+            {'Citta': {'$regex': stringa, '$options': 'i'}}
+        ]
+    }
+    print(query)
+    risultati_concerti = Concerti_clt.find(query)
     risultati_concerti_lista = list(risultati_concerti)
     print(risultati_concerti_lista)
     return risultati_concerti_lista

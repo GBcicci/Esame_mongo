@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 import query_file as qf
-from query_file import filtra_concerti
 
 app = Flask(__name__)
 generi = qf.trova_generi()
@@ -14,35 +13,36 @@ def principale():
 
 @app.route("/filtri")
 def concerti_filtrati():
-    lista_generi = request.args.getlist('genere')
-    data = request.args.get('data')
-    citta = request.args.get('citta')
-    artisti = request.args.get('artisti')
-    prezzo = request.args.get('prezzo')
+    generi_lista = []
+    for elem in generi:
+        item = request.args.get(f'genere_{elem}')
+        if item != None:
+            generi_lista.append(item)
+    data = request.args.get('date')
+    citta = request.args.get('city')
+    artista = request.args.get('artist')
+    prezzo = request.args.get('max-price')
     tipo = request.args.get('tipo_evento')
     if int(tipo) == 1:
-        risultati = qf.filtra_concerti(
-            lista_generi=lista_generi,
-            date=data,
-            citta=citta,
-            artisti=artisti,
-            prezzo=prezzo
-        )
+        risultati = qf.filtra_concerti(lista_generi=generi_lista, date=data, citta=citta, artista=artista,
+                                       prezzo=prezzo)
         return render_template("principale.html", concerti=risultati, genres=generi)
     elif int(tipo) == 2:
-        festivals = qf.filtra_festival(
-            lista_generi=lista_generi,
+        festivals_hash = qf.filtra_festival(
+            lista_generi=generi_lista,
             date=data,
             citta=citta,
-            artisti=artisti,
+            artista=artista,
             prezzo=prezzo
         )
+        festivals = qf.visualizza_festival(festivals_hash)
         return render_template('principale_festival.html', festivals=festivals, genres=generi)
 
 
 @app.route("/ricerca_generale")
 def ricerca_generale():
     stringa = request.args.get('stringa')
+    print(stringa)
     out = qf.ricerca_generale(stringa)
     return render_template("principale.html", concerti=out, genres=generi)
 

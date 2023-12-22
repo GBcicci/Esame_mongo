@@ -115,7 +115,7 @@
         <h1>TicketHub - Il tuo portale per i concerti</h1>
         <div class="search-container">
             <form action="/ricerca_generale" method="get">
-                <input type="text" id="stringa" placeholder="Cerca il tuo prossimo concerto...">
+                <input type="text" id="stringa" name="stringa" placeholder="Cerca il tuo prossimo concerto...">
                 <button type="submit">Cerca</button>
             </form>
         </div>
@@ -140,10 +140,10 @@
                 </div>
 
 
-                <!-- Data (Range temporale) -->
+                <!-- Data -->
                 <div class="filter-section">
-                    <label for="start-date">Data Inizio:</label>
-                    <input type="date" id="start-date" name="start-date">
+                    <label for="date">Data Inizio:</label>
+                    <input type="date" id="date" name="date">
                 </div>
 
 
