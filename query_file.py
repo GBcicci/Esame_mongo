@@ -153,3 +153,10 @@ def ricerca_generale(stringa: str) -> list:
     risultati_concerti_lista = list(risultati_concerti)
     print(risultati_concerti_lista)
     return risultati_concerti_lista
+
+def ricerca_geografica_concerti():
+    # funzione che date le coordinate e raggio restituisce i concerti in quell'area
+    ...
+def ricerca_geografica_festival():
+    # funzione che date le coordinate e raggio restituisce i concerti in quell'area
+    ...

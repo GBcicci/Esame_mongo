@@ -72,5 +72,10 @@ def acquista_festival():
     return render_template('errore.html', nome=out)
 
 
+@app.route("/filtri_geo")
+def filtri_geo():
+        ...
+
+
 if __name__ == '__main__':
     app.run()

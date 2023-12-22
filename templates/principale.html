@@ -105,6 +105,8 @@
 
 
 
+
+
     </style>
 </head>
 
@@ -177,6 +179,24 @@
                 <!-- Bottone "Applica Filtri" -->
                 <button class="apply-filters-button" type="submit">Applica Filtri</button>
             </form>
+            <form action="/filtri_geo" method="get">
+                <label for="latitudine">Latitudine:</label>
+                <input type="text" id="latitudine" name="latitudine" required>
+
+                <label for="longitudine">Longitudine:</label>
+                <input type="text" id="longitudine" name="longitudine" required>
+
+                <label for="raggio">Raggio:</label>
+                <input type="number" id="raggio" name="raggio" value="2" min="1">
+
+                <label for="tipo_evento">Tipo di evento:</label>
+                <select id="tipo_evento" name="tipo_evento">
+                    <option value=2>Festival</option>
+                    <option value=1>Concerto</option>
+                </select>
+
+                <button type="submit">Filtra</button>
+            </form>
         </div>
     </div>
 
@@ -196,7 +216,8 @@
                     <p>Scegli il tipo di biglietto:</p>
                     {% for tipo, prezzo in concerto['Prezzi'].items() %}
                     <label>
-                        <input type="radio" name="tipo_biglietto" value="{{ tipo }}"> {{ tipo }} - €{{ prezzo }} --{{ concerto['_id'] }}
+                        <input type="radio" name="tipo_biglietto" value="{{ tipo }}"> {{ tipo }} - €{{ prezzo }} --{{
+                        concerto['_id'] }}
                     </label><br>
                     {% endfor %}
                     <br>
