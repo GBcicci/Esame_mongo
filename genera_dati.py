@@ -20,9 +20,11 @@ citta, provincia = generate_random_city_and_province()
 
 
 def generate_geometry():
+    lat = random.uniform(-90, 90)
+    lon = random.uniform(-180, 180)
     return {
         "type": "Point",
-        "coordinates": [random.uniform(-180, 180), random.uniform(-90, 90)]
+        "coordinates": [lon, lat]
     }
 
 

@@ -148,15 +148,39 @@ def ricerca_generale(stringa: str) -> list:
             {'Citta': {'$regex': stringa, '$options': 'i'}}
         ]
     }
-    print(query)
     risultati_concerti = Concerti_clt.find(query)
     risultati_concerti_lista = list(risultati_concerti)
-    print(risultati_concerti_lista)
     return risultati_concerti_lista
 
-def ricerca_geografica_concerti():
+
+def ricerca_geografica_concerti(latitudine: float, longitudine: float, raggio: float):
     # funzione che date le coordinate e raggio restituisce i concerti in quell'area
-    ...
-def ricerca_geografica_festival():
+    query = {"geometry.coordinates": {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point", "coordinates": [latitudine, longitudine]
+                    },
+                    "$maxDistance":  raggio * 1000
+                    }
+        }
+    }
+    risultati = Concerti_clt.find(query)
+    return list(risultati)
+
+
+def ricerca_geografica_festival(latitudine: float, longitudine: float, raggio: float):
     # funzione che date le coordinate e raggio restituisce i concerti in quell'area
-    ...
+    query = {"geometry.coordinates": {
+        "$near": {
+            "$geometry": {
+                "type": "Point", "coordinates": [latitudine, longitudine]
+            },
+            "$maxDistance": raggio * 1000
+        }
+    }
+    }
+    risultati = Festival_clt.find(query)
+    out = []
+    for elem in risultati:
+        out.append(elem["id_univoco"])
+    return out

@@ -74,7 +74,18 @@ def acquista_festival():
 
 @app.route("/filtri_geo")
 def filtri_geo():
-        ...
+    longitudine = float(request.args.get('longitudine'))
+    latitudine = float(request.args.get('latitudine'))
+    raggio = float(request.args.get('raggio'))
+    tipo_evento = int(request.args.get('tipo_evento'))
+    if tipo_evento == 1:
+        out = qf.ricerca_geografica_concerti(latitudine=latitudine, longitudine=longitudine, raggio=raggio)
+        return render_template("principale.html", concerti=out, genres=generi)
+    else:
+        festivals_hash = qf.ricerca_geografica_festival(latitudine=latitudine, longitudine=longitudine, raggio=raggio)
+        festivals = qf.visualizza_festival(festivals_hash)
+        return render_template('principale_festival.html', festivals=festivals, genres=generi)
+
 
 
 if __name__ == '__main__':
